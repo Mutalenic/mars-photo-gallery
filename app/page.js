@@ -1,13 +1,16 @@
 'use client'
-import MarsPhotos from "./components/marsphotos";
+import MarsPhotos from "./components/MarsPhotos";
+import Header from "./components/Header";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <h1 className="text-4xl font-bold mb-8">Mars Rover Photos</h1>
-      <MarsPhotos rover="curiosity" />
-      <MarsPhotos rover="spirit" />
-      <MarsPhotos rover="opportunity" />
-    </main>
+    <div className="container">
+      <Header />
+      <main className="flex flex-col items-center justify-center min-h-screen py-20">
+        <h1 className="text-4xl font-bold mb-8">Mars Rover Photos</h1>
+        <MarsPhotos />
+      </main>
+    </div>
   );
 }
+
