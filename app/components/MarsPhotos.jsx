@@ -8,6 +8,8 @@ const MarsPhotos = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [previewPhotos, setPreviewPhotos] = useState([]);
+  const [previewIndex, setPreviewIndex] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,8 +22,9 @@ const MarsPhotos = () => {
           throw new Error('Failed to fetch data');
         }
         const data = await response.json();
-        // Limiting photos to a maximum of 8 images
-        setPhotos(data.photos.slice(0, 8));
+        const allPhotos = data.photos.slice(0, 60);
+        setPhotos(allPhotos);
+        setPreviewPhotos(allPhotos.slice(0, 30));
       } catch (error) {
         setError(error.message);
       } finally {
@@ -40,6 +43,14 @@ const MarsPhotos = () => {
     setSelectedPhoto(null);
   };
 
+  const handleArrowClick = (direction) => {
+    if (direction === 'prev') {
+      setPreviewIndex((prevIndex) => (prevIndex === 0 ? previewPhotos.length - 1 : prevIndex - 1));
+    } else {
+      setPreviewIndex((prevIndex) => (prevIndex === previewPhotos.length - 1 ? 0 : prevIndex + 1));
+    }
+  };
+
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -49,17 +60,20 @@ const MarsPhotos = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-8 justify-center items-center">
-      {photos.map((photo) => (
-        <div key={photo.id} className="relative cursor-pointer">
+    <div className="container">
+      <div className="preview">
+        {previewPhotos.map((photo, index) => (
           <img
+            key={index}
             src={photo.img_src}
             alt={photo.id}
-            className="block w-full h-auto rounded-lg transition-transform duration-300 transform hover:scale-105"
+            className={`preview-img ${index === previewIndex ? 'active' : ''}`}
             onClick={() => handlePhotoClick(photo)}
           />
-        </div>
-      ))}
+        ))}
+        <button className="arrow prev" onClick={() => handleArrowClick('prev')}>&#10094;</button>
+        <button className="arrow next" onClick={() => handleArrowClick('next')}>&#10095;</button>
+      </div>
       {selectedPhoto && (
         <div className="modal">
           <div className="modal-content">
