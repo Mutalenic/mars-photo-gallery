@@ -3,27 +3,41 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --foreground-light-rgb: 0, 0, 0;
+  --background-start-light-rgb: 214, 219, 220;
+  --background-end-light-rgb: 255, 255, 255;
+
+  --foreground-dark-rgb: 255, 255, 255;
+  --background-start-dark-rgb: 0, 0, 0;
+  --background-end-dark-rgb: 0, 0, 0;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --foreground-rgb: var(--foreground-dark-rgb);
+    --background-start-rgb: var(--background-start-dark-rgb);
+    --background-end-rgb: var(--background-end-dark-rgb);
   }
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
+  color: rgb(var(--foreground-light-rgb));
   background: linear-gradient(
       to bottom,
       transparent,
-      rgb(var(--background-end-rgb))
+      rgb(var(--background-end-light-rgb))
     )
-    rgb(var(--background-start-rgb));
+    rgb(var(--background-start-light-rgb));
+}
+
+.dark-mode body {
+  color: rgb(var(--foreground-dark-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-dark-rgb))
+    )
+    rgb(var(--background-start-dark-rgb));
 }
 
 @layer utilities {
