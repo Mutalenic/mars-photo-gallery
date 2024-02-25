@@ -7,7 +7,7 @@ const Description = () => {
         </p>
         <h2 className="text-xl font-semibold mb-2">Key Features:</h2>
         <ul className="list-disc pl-6">
-          <li className="mb-2">Authentic NASA API Integration: Interact directly with NASA's API, ensuring access to real-time, high-resolution photos.</li>
+          <li className="mb-2">Authentic NASA API Integration: Interact directly with NASA`&apos;`s API, ensuring access to real-time, high-resolution photos.</li>
           <li className="mb-2">Intuitive Interface: Enjoy a user-friendly experience for navigating and appreciating the diverse Martian imagery.</li>
           <li className="mb-2">Current Focus: Immerse yourself in the captivating views from the Mast Camera.</li>
           <li className="mb-2">Anticipated Expansions: Look forward to the inclusion of photos from other cameras, offering new perspectives on Mars.</li>
