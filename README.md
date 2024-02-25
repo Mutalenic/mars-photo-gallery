@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# MarsPhotos.app: Explore the Red Planet with NASA's API
 
-## Getting Started
+Description:
 
-First, run the development server:
+MarsPhotos.app is a Next.js web application that empowers you to delve into the captivating world of Mars through breathtaking images captured by NASA's rovers. Currently, embark on a journey with the Mast Camera, uncovering majestic landscapes, craters, and geological wonders. Stay tuned for exciting updates as we expand the collection to include photos from other cameras, further enriching your exploration experience.
 
-```bash
+Key Features:
+
+Authentic NASA API Integration: Interact directly with NASA's API, ensuring access to real-time, high-resolution photos.
+Intuitive Interface: Enjoy a user-friendly experience for navigating and appreciating the diverse Martian imagery.
+Current Focus: Immerse yourself in the captivating views from the Mast Camera.
+Anticipated Expansions: Look forward to the inclusion of photos from other cameras, offering new perspectives on Mars.
+
+# Getting Started:
+
+# Clone this repository:
+Bash
+git clone https://github.com/your-username/marsphotos.app.git
+
+
+# Install dependencies:
+Bash
+
+# npm install
+
+# Run the development server:
+Bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Access the app: Open http://localhost:3000 in your browser.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Author
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+**Nicholas Kasonde Mutale**
 
-## Learn More
+- GitHub: [@mutalenic](https://github.com/mutalenic)
+- Twitter: [@nicomutale](https://twitter.com/nicomutale)
+- LinkedIn: [nicomutale](https://linkedin.com/in/nicomutale)
 
-To learn more about Next.js, take a look at the following resources:
+## 🤝 Contributions Welcome
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Contributions, issues, and feature requests are welcome!
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Feel free to check the [issues page](https://github.com/Mutalenic/mars-photo-gallery/issues).
 
-## Deploy on Vercel
+## Show your support
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Give a ⭐️ if you like this project!
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Acknowledgments
+
+- Thanks to [NASA'S API](https://api.nasa.gov/) for the NASA portal
+
+## 📝 License
+
+This project is [MIT](./MIT.md) licensed.
+* [Creative Common License of design](https://creativecommons.org/licenses/by-nc/4.0/)
