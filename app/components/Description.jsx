@@ -3,7 +3,7 @@ const Description = () => {
     return (
       <div className="max-w-2xl mx-auto py-8">
         <p className="text-lg mb-4">
-          MarsPhotos.app is a Next.js web application that empowers you to delve into the captivating world of Mars through breathtaking images captured by NASA's rovers. Currently, embark on a journey with the Mast Camera, uncovering majestic landscapes, craters, and geological wonders. Stay tuned for exciting updates as we expand the collection to include photos from other cameras, further enriching your exploration experience.
+          MarsPhotos.app is a Next.js web application that empowers you to delve into the captivating world of Mars through breathtaking images captured by NASA`&apos;`s rovers. Currently, embark on a journey with the Mast Camera, uncovering majestic landscapes, craters, and geological wonders. Stay tuned for exciting updates as we expand the collection to include photos from other cameras, further enriching your exploration experience.
         </p>
         <h2 className="text-xl font-semibold mb-2">Key Features:</h2>
         <ul className="list-disc pl-6">
