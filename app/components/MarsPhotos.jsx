@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import LoadingSpinner from "./LoadingSpinner";
 import ErrorDisplay from "./ErrorDisplay";
 import "./styles.css";
+import Image from "next/image";
 
 const MarsPhotos = () => {
   const [photos, setPhotos] = useState([]);
@@ -78,7 +79,7 @@ const MarsPhotos = () => {
         <div className="modal">
           <div className="modal-content">
             <span className="close" onClick={handleCloseModal}>&times;</span>
-            <img src={selectedPhoto.img_src} alt={selectedPhoto.id} className="modal-img" />
+            <Image src={selectedPhoto.img_src} alt={selectedPhoto.id} className="modal-img" />
           </div>
         </div>
       )}
