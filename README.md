@@ -29,6 +29,8 @@ npm run dev
 
 Access the app: Open http://localhost:3000 in your browser.
 
+## [Live Demo](https://mars-photo-gallery-7jf8zzgaq-mutalenic.vercel.app/) 
+
 ## Author
 
 **Nicholas Kasonde Mutale**
