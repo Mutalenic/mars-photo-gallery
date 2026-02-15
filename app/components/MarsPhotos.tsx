@@ -3,13 +3,16 @@
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
-import { fetchMarsPhotos } from "@/lib/nasaClient";
+import { fetchMarsPhotos, fetchMarsWeather, fetchAPOD } from "@/lib/nasaClient";
 import { DEFAULT_FILTERS, LANDING_SITE_OPTIONS, ROVER_CAMERAS, ROVER_OPTIONS } from "@/lib/constants";
 import { CameraCode, PhotoSummary, ProcessedPhoto, QueryFilters } from "@/types/nasa";
 
 import ErrorDisplay from "./ErrorDisplay";
 import LoadingSpinner from "./LoadingSpinner";
 import PhotoSkeleton from "./PhotoSkeleton";
+import MarsWeather from "./MarsWeather";
+import APODPanel from "./APODPanel";
+import SolTimeline from "./SolTimeline";
 
 const MarsPhotos = () => {
   const [queryFilters, setQueryFilters] = useState<QueryFilters>(DEFAULT_FILTERS);
@@ -21,6 +24,34 @@ const MarsPhotos = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
+  const [marsWeather, setMarsWeather] = useState<any>(null);
+  const [apod, setApod] = useState<any>(null);
+
+  // Initialize with mock data immediately to avoid loading issues
+  useEffect(() => {
+    // Set initial mock data right away
+    setMarsWeather({
+      atmo_opacity: 'Sunny',
+      season: 'Summer',
+      terrestrial_date: '2015-05-30',
+      sol: 1000,
+      ls: 180,
+      min_temp: -75,
+      max_temp: -15,
+      pressure: 8.5,
+      unit_pressure: 'mbar',
+      wind_speed: 7.2,
+      unit_wind_speed: 'm/s'
+    });
+    
+    setApod({
+      title: 'Mars from Space',
+      url: '/mars-perseverance-webb.jpg',
+      explanation: 'The Red Planet as seen from space, showcasing its distinctive rusty color and polar ice caps.'
+    });
+    
+    setInitialLoading(false);
+  }, []);
 
   // Keyboard navigation handlers
   useEffect(() => {
@@ -39,23 +70,34 @@ const MarsPhotos = () => {
     setLoading(true);
     setError(null);
 
-    fetchMarsPhotos(queryFilters)
-      .then((result) => {
-        if (cancelled) return;
-        setPhotos(result.photos);
-        setSummary(result.summary);
-        setInitialLoading(false);
-      })
-      .catch((err: Error) => {
-        if (cancelled) return;
-        setError(err.message);
-        setInitialLoading(false);
-      })
-      .finally(() => {
+    const fetchData = async () => {
+      try {
+        const [photosResult, weatherResult, apodResult] = await Promise.all([
+          fetchMarsPhotos(queryFilters),
+          fetchMarsWeather(),
+          fetchAPOD()
+        ]);
+        
+        if (!cancelled) {
+          setPhotos(photosResult.photos);
+          setSummary(photosResult.summary);
+          setMarsWeather(weatherResult);
+          setApod(apodResult);
+          setInitialLoading(false);
+        }
+      } catch (err: Error) {
+        if (!cancelled) {
+          setError(err.message);
+          setInitialLoading(false);
+        }
+      } finally {
         if (!cancelled) {
           setLoading(false);
         }
-      });
+      }
+    };
+
+    fetchData();
 
     return () => {
       cancelled = true;
@@ -131,6 +173,14 @@ const MarsPhotos = () => {
     }));
   };
 
+  const handleTimelineSolChange = (sol: number) => {
+    setQueryFilters((prev) => ({
+      ...prev,
+      sol,
+      dateMode: "sol"
+    }));
+  };
+
   const handleEarthDateChange = (value: string) => {
     setQueryFilters((prev) => ({
       ...prev,
@@ -149,15 +199,15 @@ const MarsPhotos = () => {
   return (
     <section className="space-y-8">
       {/* Primary Filters */}
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-        <h2 className="mb-6 text-lg font-semibold text-white">Mission Controls</h2>
+      <div className="mission-panel rounded-2xl p-6">
+        <h2 className="mb-6 text-lg font-semibold text-white data-display">MISSION CONTROLS</h2>
         
         {/* Rover and Camera Selection */}
         <div className="mb-6 grid gap-4 sm:grid-cols-2">
           <label className="text-sm font-medium text-white/80">
             Rover
             <select
-              className="mt-2 w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white transition-colors focus:border-amber-400/50 focus:outline-none"
+              className="mission-button mt-2 w-full rounded-lg p-3 text-white transition-colors focus:border-amber-400/50 focus:outline-none"
               value={queryFilters.rover}
               onChange={(event) => setQueryFilters((prev) => ({ ...prev, rover: event.target.value as QueryFilters["rover"], camera: "all" }))}
               aria-label="Select rover"
@@ -173,7 +223,7 @@ const MarsPhotos = () => {
           <label className="text-sm font-medium text-white/80">
             Camera
             <select
-              className="mt-2 w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white transition-colors focus:border-amber-400/50 focus:outline-none"
+              className="mission-button mt-2 w-full rounded-lg p-3 text-white transition-colors focus:border-amber-400/50 focus:outline-none"
               value={queryFilters.camera}
               onChange={(event) => handleCameraChange(event.target.value)}
               aria-label="Select camera"
@@ -188,14 +238,14 @@ const MarsPhotos = () => {
         </div>
 
         {/* Date Selection */}
-        <div className="rounded-xl border border-white/5 bg-white/5 p-4">
-          <label className="text-sm font-medium text-white/80">Date Mode</label>
+        <div className="mission-panel rounded-xl p-4">
+          <label className="text-sm font-medium text-white/80 data-display">DATE MODE</label>
           <div className="mt-3 flex gap-2">
             {["sol", "earth"].map((mode) => (
               <button
                 key={mode}
                 onClick={() => handleDateModeChange(mode as QueryFilters["dateMode"])}
-                className={`flex-1 rounded-lg border p-3 text-sm font-semibold transition-colors ${
+                className={`flex-1 rounded-lg border p-3 text-sm font-semibold transition-colors mission-button ${
                   queryFilters.dateMode === mode 
                     ? "border-amber-400 bg-amber-300/10 text-amber-200" 
                     : "border-white/10 text-white hover:border-white/20"
@@ -215,7 +265,7 @@ const MarsPhotos = () => {
                 min={0}
                 value={queryFilters.sol ?? 0}
                 onChange={(event) => handleSolChange(event.target.value)}
-                className="mt-2 w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white transition-colors focus:border-amber-400/50 focus:outline-none"
+                className="mission-button mt-2 w-full rounded-lg p-3 text-white transition-colors focus:border-amber-400/50 focus:outline-none data-display"
                 aria-label="Enter sol number"
               />
             ) : (
@@ -223,7 +273,7 @@ const MarsPhotos = () => {
                 type="date"
                 value={queryFilters.earthDate ?? ""}
                 onChange={(event) => handleEarthDateChange(event.target.value)}
-                className="mt-2 w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white transition-colors focus:border-amber-400/50 focus:outline-none"
+                className="mission-button mt-2 w-full rounded-lg p-3 text-white transition-colors focus:border-amber-400/50 focus:outline-none"
                 aria-label="Select earth date"
               />
             )}
@@ -232,8 +282,8 @@ const MarsPhotos = () => {
       </div>
 
       {/* Secondary Filters */}
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-        <h3 className="mb-4 text-base font-semibold text-white">Additional Filters</h3>
+      <div className="mission-panel rounded-2xl p-6">
+        <h3 className="mb-4 text-base font-semibold text-white data-display">ADDITIONAL FILTERS</h3>
         <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-3">
           <label className="text-sm font-medium text-white/80">
             Landing Site
@@ -274,6 +324,26 @@ const MarsPhotos = () => {
           </label>
         </div>
       </div>
+
+      {/* Mission Intelligence Dashboard */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {marsWeather && (
+          <div className="lg:col-span-1">
+            <MarsWeather weather={marsWeather} />
+          </div>
+        )}
+        {apod && (
+          <div className="lg:col-span-2">
+            <APODPanel apod={apod} />
+          </div>
+        )}
+      </div>
+
+      {/* Sol Timeline Navigation */}
+      <SolTimeline 
+        currentSol={queryFilters.sol ?? 1000} 
+        onSolChange={handleTimelineSolChange}
+      />
 
       {heroPhoto && (
         <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">

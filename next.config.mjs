@@ -13,6 +13,10 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "cdn.mars.nasa.gov"
+      },
+      {
+        protocol: "https",
+        hostname: "apod.nasa.gov"
       }
     ]
   }
