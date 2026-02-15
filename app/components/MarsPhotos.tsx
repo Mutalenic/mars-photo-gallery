@@ -9,6 +9,7 @@ import { CameraCode, PhotoSummary, ProcessedPhoto, QueryFilters } from "@/types/
 
 import ErrorDisplay from "./ErrorDisplay";
 import LoadingSpinner from "./LoadingSpinner";
+import PhotoSkeleton from "./PhotoSkeleton";
 
 const MarsPhotos = () => {
   const [queryFilters, setQueryFilters] = useState<QueryFilters>(DEFAULT_FILTERS);
@@ -19,6 +20,19 @@ const MarsPhotos = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<ProcessedPhoto | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [initialLoading, setInitialLoading] = useState<boolean>(true);
+
+  // Keyboard navigation handlers
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && selectedPhoto) {
+        setSelectedPhoto(null);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [selectedPhoto]);
 
   useEffect(() => {
     let cancelled = false;
@@ -30,10 +44,12 @@ const MarsPhotos = () => {
         if (cancelled) return;
         setPhotos(result.photos);
         setSummary(result.summary);
+        setInitialLoading(false);
       })
       .catch((err: Error) => {
         if (cancelled) return;
         setError(err.message);
+        setInitialLoading(false);
       })
       .finally(() => {
         if (!cancelled) {
@@ -131,15 +147,20 @@ const MarsPhotos = () => {
   }
 
   return (
-    <section className="space-y-10">
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <label className="text-sm text-white/70">
+    <section className="space-y-8">
+      {/* Primary Filters */}
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+        <h2 className="mb-6 text-lg font-semibold text-white">Mission Controls</h2>
+        
+        {/* Rover and Camera Selection */}
+        <div className="mb-6 grid gap-4 sm:grid-cols-2">
+          <label className="text-sm font-medium text-white/80">
             Rover
             <select
-              className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white"
+              className="mt-2 w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white transition-colors focus:border-amber-400/50 focus:outline-none"
               value={queryFilters.rover}
               onChange={(event) => setQueryFilters((prev) => ({ ...prev, rover: event.target.value as QueryFilters["rover"], camera: "all" }))}
+              aria-label="Select rover"
             >
               {ROVER_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value} className="bg-slate-900">
@@ -149,12 +170,13 @@ const MarsPhotos = () => {
             </select>
           </label>
 
-          <label className="text-sm text-white/70">
+          <label className="text-sm font-medium text-white/80">
             Camera
             <select
-              className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white"
+              className="mt-2 w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white transition-colors focus:border-amber-400/50 focus:outline-none"
               value={queryFilters.camera}
               onChange={(event) => handleCameraChange(event.target.value)}
+              aria-label="Select camera"
             >
               {cameraOptions.map((option) => (
                 <option key={option.value} value={option.value} className="bg-slate-900">
@@ -163,25 +185,29 @@ const MarsPhotos = () => {
               ))}
             </select>
           </label>
+        </div>
 
-          <label className="text-sm text-white/70">
-            Mode
-            <div className="mt-1 flex gap-2">
-              {["sol", "earth"].map((mode) => (
-                <button
-                  key={mode}
-                  onClick={() => handleDateModeChange(mode as QueryFilters["dateMode"])}
-                  className={`flex-1 rounded-xl border p-3 text-sm font-semibold ${
-                    queryFilters.dateMode === mode ? "border-amber-400 bg-amber-300/10 text-amber-200" : "border-white/10 text-white"
-                  }`}
-                >
-                  {mode.toUpperCase()}
-                </button>
-              ))}
-            </div>
-          </label>
-
-          <label className="text-sm text-white/70">
+        {/* Date Selection */}
+        <div className="rounded-xl border border-white/5 bg-white/5 p-4">
+          <label className="text-sm font-medium text-white/80">Date Mode</label>
+          <div className="mt-3 flex gap-2">
+            {["sol", "earth"].map((mode) => (
+              <button
+                key={mode}
+                onClick={() => handleDateModeChange(mode as QueryFilters["dateMode"])}
+                className={`flex-1 rounded-lg border p-3 text-sm font-semibold transition-colors ${
+                  queryFilters.dateMode === mode 
+                    ? "border-amber-400 bg-amber-300/10 text-amber-200" 
+                    : "border-white/10 text-white hover:border-white/20"
+                }`}
+                aria-pressed={queryFilters.dateMode === mode}
+              >
+                {mode.toUpperCase()}
+              </button>
+            ))}
+          </div>
+          
+          <label className="mt-4 block text-sm font-medium text-white/80">
             {queryFilters.dateMode === "sol" ? "Sol (Martian day)" : "Earth Date"}
             {queryFilters.dateMode === "sol" ? (
               <input
@@ -189,26 +215,33 @@ const MarsPhotos = () => {
                 min={0}
                 value={queryFilters.sol ?? 0}
                 onChange={(event) => handleSolChange(event.target.value)}
-                className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white"
+                className="mt-2 w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white transition-colors focus:border-amber-400/50 focus:outline-none"
+                aria-label="Enter sol number"
               />
             ) : (
               <input
                 type="date"
                 value={queryFilters.earthDate ?? ""}
                 onChange={(event) => handleEarthDateChange(event.target.value)}
-                className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white"
+                className="mt-2 w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white transition-colors focus:border-amber-400/50 focus:outline-none"
+                aria-label="Select earth date"
               />
             )}
           </label>
         </div>
+      </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <label className="text-sm text-white/70">
-            Landing site filter
+      {/* Secondary Filters */}
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+        <h3 className="mb-4 text-base font-semibold text-white">Additional Filters</h3>
+        <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-3">
+          <label className="text-sm font-medium text-white/80">
+            Landing Site
             <select
-              className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white"
+              className="mt-2 w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white transition-colors focus:border-amber-400/50 focus:outline-none"
               value={landingSite}
               onChange={(event) => setLandingSite(event.target.value)}
+              aria-label="Filter by landing site"
             >
               {LANDING_SITE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value} className="bg-slate-900">
@@ -218,23 +251,25 @@ const MarsPhotos = () => {
             </select>
           </label>
 
-          <label className="text-sm text-white/70">
-            Start date
+          <label className="text-sm font-medium text-white/80">
+            Start Date
             <input
               type="date"
               value={dateRange.start}
               onChange={(event) => setDateRange((prev) => ({ ...prev, start: event.target.value }))}
-              className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white"
+              className="mt-2 w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white transition-colors focus:border-amber-400/50 focus:outline-none"
+              aria-label="Filter start date"
             />
           </label>
 
-          <label className="text-sm text-white/70">
-            End date
+          <label className="text-sm font-medium text-white/80">
+            End Date
             <input
               type="date"
               value={dateRange.end}
               onChange={(event) => setDateRange((prev) => ({ ...prev, end: event.target.value }))}
-              className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white"
+              className="mt-2 w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white transition-colors focus:border-amber-400/50 focus:outline-none"
+              aria-label="Filter end date"
             />
           </label>
         </div>
@@ -283,41 +318,101 @@ const MarsPhotos = () => {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filteredPhotos.map((photo) => (
-          <button
-            key={photo.id}
-            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 text-left"
-            onClick={() => setSelectedPhoto(photo)}
-          >
-            <Image src={photo.img_src} alt={`${photo.camera.full_name}`} width={600} height={600} className="h-64 w-full object-cover transition duration-300 group-hover:scale-105" />
-            <div className="space-y-1 p-4 text-white">
-              <p className="text-sm uppercase tracking-[0.3em] text-amber-200">{photo.rover.name}</p>
-              <p className="text-base font-semibold">{photo.camera.full_name}</p>
-              <p className="text-sm text-white/70">{photo.earth_date}</p>
-            </div>
-          </button>
-        ))}
+      {/* Photo Grid */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-white">
+          {initialLoading ? "Loading Mission Data" : `Photo Gallery (${filteredPhotos.length} photos)`}
+        </h3>
+        
+        {initialLoading ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <PhotoSkeleton key={index} />
+            ))}
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredPhotos.map((photo, index) => (
+              <button
+                key={photo.id}
+                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 text-left transition-all hover:border-amber-400/30 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-slate-900"
+                onClick={() => setSelectedPhoto(photo)}
+                aria-label={`View photo ${photo.camera.full_name} captured by ${photo.rover.name} on ${photo.earth_date}`}
+              >
+                <div className="relative h-64 w-full overflow-hidden">
+                  <Image 
+                    src={photo.img_src} 
+                    alt={`${photo.camera.full_name} - ${photo.rover.name}`} 
+                    width={600} 
+                    height={600} 
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" 
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                </div>
+                <div className="space-y-2 p-4 text-white">
+                  <p className="text-sm uppercase tracking-[0.3em] text-amber-200">{photo.rover.name}</p>
+                  <p className="text-base font-semibold">{photo.camera.full_name}</p>
+                  <p className="text-sm text-white/70">{photo.earth_date}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+        
+        {!initialLoading && filteredPhotos.length === 0 && (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center">
+            <p className="text-white/70">No photos found matching your current filters.</p>
+            <button 
+              onClick={() => {
+                setQueryFilters(DEFAULT_FILTERS);
+                setLandingSite("all");
+                setDateRange({ start: "", end: "" });
+              }}
+              className="mt-4 rounded-lg border border-amber-400/50 bg-amber-400/10 px-4 py-2 text-amber-200 transition-colors hover:bg-amber-400/20"
+            >
+              Clear all filters
+            </button>
+          </div>
+        )}
       </div>
 
       {selectedPhoto && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+        >
           <div className="relative w-full max-w-4xl overflow-hidden rounded-3xl border border-white/10 bg-slate-950">
-            <button className="absolute right-4 top-4 rounded-full border border-white/20 p-2 text-white" onClick={() => setSelectedPhoto(null)}>
-              &times;
+            <button 
+              className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-amber-400" 
+              onClick={() => setSelectedPhoto(null)}
+              aria-label="Close modal"
+            >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
-            <Image src={selectedPhoto.img_src} alt="Selected Mars capture" width={1600} height={1200} className="h-[500px] w-full object-cover" />
+            <Image 
+              src={selectedPhoto.img_src} 
+              alt={`Mars rover photo ${selectedPhoto.id} - ${selectedPhoto.camera.full_name}`} 
+              width={1600} 
+              height={1200} 
+              className="h-[500px] w-full object-cover" 
+              priority
+            />
             <div className="grid gap-4 p-6 text-white md:grid-cols-2">
               <div>
-                <p className="text-sm uppercase tracking-[0.3em] text-amber-200">{selectedPhoto.rover.name}</p>
-                <h4 className="text-2xl font-semibold">{selectedPhoto.camera.full_name}</h4>
+                <h3 id="modal-title" className="text-2xl font-semibold">{selectedPhoto.camera.full_name}</h3>
+                <p className="mt-1 text-sm uppercase tracking-[0.3em] text-amber-200">{selectedPhoto.rover.name}</p>
                 <p className="text-white/70">Captured {selectedPhoto.earth_date}</p>
               </div>
               <div className="space-y-2 text-sm text-white/70">
-                <p>Landing site: {selectedPhoto.landingSite.name}</p>
-                <p>Region: {selectedPhoto.landingSite.region}</p>
-                <p>Quality score: {selectedPhoto.qualityScore}</p>
-                <p>Dominant color: {selectedPhoto.dominantColor}</p>
+                <p><span className="font-medium">Landing site:</span> {selectedPhoto.landingSite.name}</p>
+                <p><span className="font-medium">Region:</span> {selectedPhoto.landingSite.region}</p>
+                <p><span className="font-medium">Quality score:</span> {selectedPhoto.qualityScore}</p>
+                <p><span className="font-medium">Dominant color:</span> {selectedPhoto.dominantColor}</p>
               </div>
             </div>
           </div>

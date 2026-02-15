@@ -4,10 +4,9 @@ import Header from "./components/Header";
 
 export default function Home() {
   return (
-    <div className="container">
+    <div className="min-h-screen bg-slate-900">
       <Header />
-      <main className="flex flex-col items-center justify-center min-h-screen py-10">
-        <h1 className="text-4xl font-bold mb-8">Mars Rover Photos</h1>
+      <main className="py-8">
         <MarsPhotos />
       </main>
     </div>
