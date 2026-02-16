@@ -40,14 +40,25 @@ const getMockData = (): MarsPhotoResponse => {
         name: "Curiosity",
         landing_date: "2012-08-06",
         launch_date: "2011-11-26",
-        status: "active"
+        status: "active",
+        max_sol: 3000,
+        max_date: "2024-02-15",
+        total_photos: 750000,
+        cameras: [
+          { name: "FHAZ", full_name: "Front Hazard Avoidance Camera" },
+          { name: "RHAZ", full_name: "Rear Hazard Avoidance Camera" },
+          { name: "MAST", full_name: "Mast Camera" }
+        ]
       },
       qualityScore: 75,
       dominantColor: "hsl(120, 45%, 55%)",
       landingSite: {
-        id: "gale_crater",
+        id: "gale-crater",
         name: "Gale Crater",
-        region: "Martian southern hemisphere"
+        latitude: -4.5895,
+        longitude: 137.4417,
+        region: "Aeolis Palus",
+        description: "Curiosity landed in Gale Crater in 2012 to investigate Mars' habitability and geology."
       }
     },
     {
@@ -66,14 +77,25 @@ const getMockData = (): MarsPhotoResponse => {
         name: "Curiosity",
         landing_date: "2012-08-06",
         launch_date: "2011-11-26",
-        status: "active"
+        status: "active",
+        max_sol: 3000,
+        max_date: "2024-02-15",
+        total_photos: 750000,
+        cameras: [
+          { name: "FHAZ", full_name: "Front Hazard Avoidance Camera" },
+          { name: "RHAZ", full_name: "Rear Hazard Avoidance Camera" },
+          { name: "MAST", full_name: "Mast Camera" }
+        ]
       },
       qualityScore: 82,
       dominantColor: "hsl(200, 45%, 55%)",
       landingSite: {
-        id: "gale_crater",
+        id: "gale-crater",
         name: "Gale Crater",
-        region: "Martian southern hemisphere"
+        latitude: -4.5895,
+        longitude: 137.4417,
+        region: "Aeolis Palus",
+        description: "Curiosity landed in Gale Crater in 2012 to investigate Mars' habitability and geology."
       }
     },
     {
@@ -92,14 +114,25 @@ const getMockData = (): MarsPhotoResponse => {
         name: "Curiosity",
         landing_date: "2012-08-06",
         launch_date: "2011-11-26",
-        status: "active"
+        status: "active",
+        max_sol: 3000,
+        max_date: "2024-02-15",
+        total_photos: 750000,
+        cameras: [
+          { name: "FHAZ", full_name: "Front Hazard Avoidance Camera" },
+          { name: "RHAZ", full_name: "Rear Hazard Avoidance Camera" },
+          { name: "MAST", full_name: "Mast Camera" }
+        ]
       },
       qualityScore: 90,
       dominantColor: "hsl(60, 45%, 55%)",
       landingSite: {
-        id: "gale_crater",
+        id: "gale-crater",
         name: "Gale Crater",
-        region: "Martian southern hemisphere"
+        latitude: -4.5895,
+        longitude: 137.4417,
+        region: "Aeolis Palus",
+        description: "Curiosity landed in Gale Crater in 2012 to investigate Mars' habitability and geology."
       }
     }
   ];
@@ -135,22 +168,6 @@ const buildRequestUrl = (filters: QueryFilters) => {
 
 // Mars Weather API - Updated endpoint
 export const fetchMarsWeather = async () => {
-  // For now, always use mock data due to API issues
-  console.log('Using mock weather data due to API availability issues');
-  return {
-    atmo_opacity: 'Sunny',
-    season: 'Summer',
-    terrestrial_date: '2015-05-30',
-    sol: 1000,
-    ls: 180,
-    min_temp: -75,
-    max_temp: -15,
-    pressure: 8.5,
-    unit_pressure: 'mbar',
-    wind_speed: 7.2,
-    unit_wind_speed: 'm/s'
-  };
-
   try {
     // Try the archive endpoint which is more reliable
     const response = await fetch('https://marsweather.ingenology.com/v1/archive/');
@@ -183,14 +200,6 @@ export const fetchMarsWeather = async () => {
 
 // APOD API
 export const fetchAPOD = async () => {
-  // For now, always use mock data due to API rate limits and image loading issues
-  console.log('Using mock APOD data due to NASA API rate limits');
-  return {
-    title: 'Mars from Space',
-    url: '/mars-perseverance-webb.jpg', // Use local image instead of external URL
-    explanation: 'The Red Planet as seen from space, showcasing its distinctive rusty color and polar ice caps.'
-  };
-
   try {
     const response = await fetch(`${NASA_API_BASE}/planetary/apod?api_key=${getApiKey()}`);
     if (!response.ok) throw new Error('APOD API failed');
@@ -200,7 +209,7 @@ export const fetchAPOD = async () => {
     console.warn('APOD API unavailable, using mock data');
     return {
       title: 'Mars from Space',
-      url: '/mars-perseverance-webb.jpg', // Use local image instead of external URL
+      url: '/mars-perseverance-webb.jpg',
       explanation: 'The Red Planet as seen from space, showcasing its distinctive rusty color and polar ice caps.'
     };
   }
@@ -261,10 +270,6 @@ export const fetchMarsPhotos = async (filters: QueryFilters): Promise<MarsPhotoR
   if (cache.has(cacheKey)) {
     return cache.get(cacheKey)!;
   }
-
-  // For now, always use mock data due to API rate limits
-  console.log('Using mock data due to NASA API rate limits');
-  return getMockData();
 
   try {
     const url = buildRequestUrl(filters);

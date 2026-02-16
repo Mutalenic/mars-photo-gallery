@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 interface MarsWeatherProps {
   weather: {
     atmo_opacity: string;

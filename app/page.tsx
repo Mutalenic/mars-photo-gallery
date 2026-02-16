@@ -7,7 +7,7 @@ export default function Home() {
     <div className="min-h-screen bg-slate-900 crt-flicker">
       <div className="scan-line">
         <Header />
-        <main className="py-8">
+        <main className="container mx-auto px-4 py-8">
           <MarsPhotos />
         </main>
       </div>

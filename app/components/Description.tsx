@@ -2,7 +2,7 @@ const Description = () => {
   return (
     <div className="max-w-3xl mx-auto text-center space-y-4">
       <p className="text-lg text-slate-100/90">
-        Mars Photo Intelligence pairs NASA's rover feeds with analytics, storytelling, and exploratory tools.
+        Mars Photo Intelligence pairs NASA&apos;s rover feeds with analytics, storytelling, and exploratory tools.
         Surface missions become case studies in computer vision, data visualization, and resilient interface design.
       </p>
       <div className="grid grid-cols-1 gap-3 text-left sm:grid-cols-2">

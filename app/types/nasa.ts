@@ -94,3 +94,23 @@ export interface ClientFilters {
     end: string;
   };
 }
+
+export interface MarsWeatherData {
+  atmo_opacity: string;
+  season: string;
+  terrestrial_date: string;
+  sol: number;
+  ls?: number;
+  min_temp: number;
+  max_temp: number;
+  pressure: number;
+  unit_pressure: string;
+  wind_speed: number;
+  unit_wind_speed: string;
+}
+
+export interface APODData {
+  title: string;
+  url: string;
+  explanation: string;
+}

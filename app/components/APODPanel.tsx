@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 interface APODProps {
   apod: {
     title: string;
@@ -39,7 +37,7 @@ const APODPanel = ({ apod }: APODProps) => {
           
           <div className="rounded-lg border border-blue-400/30 bg-blue-400/5 p-3">
             <p className="text-sm text-blue-200">
-              <span className="font-semibold">Mission Connection:</span> Today's featured cosmic view 
+              <span className="font-semibold">Mission Connection:</span> Today&apos;s featured cosmic view 
               provides context for Mars exploration, reminding us that the Red Planet is part of 
               our broader solar system neighborhood that rovers are helping us understand.
             </p>

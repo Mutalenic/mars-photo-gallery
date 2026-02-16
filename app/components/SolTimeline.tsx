@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 interface SolTimelineProps {
   currentSol: number;
   onSolChange: (sol: number) => void;
@@ -7,10 +5,8 @@ interface SolTimelineProps {
 }
 
 const SolTimeline = ({ currentSol, onSolChange, maxSol = 3000 }: SolTimelineProps) => {
-  const [isDragging, setIsDragging] = useState(false);
-  
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSolChange(parseInt(e.target.value));
+    onSolChange(parseInt(e.target.value, 10));
   };
   
   const getSolPosition = (sol: number) => (sol / maxSol) * 100;
@@ -67,10 +63,6 @@ const SolTimeline = ({ currentSol, onSolChange, maxSol = 3000 }: SolTimelineProp
             max={maxSol}
             value={currentSol}
             onChange={handleSliderChange}
-            onMouseDown={() => setIsDragging(true)}
-            onMouseUp={() => setIsDragging(false)}
-            onTouchStart={() => setIsDragging(true)}
-            onTouchEnd={() => setIsDragging(false)}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             aria-label="Mission timeline slider"
           />

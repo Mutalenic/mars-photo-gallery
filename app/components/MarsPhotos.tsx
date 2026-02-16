@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { fetchMarsPhotos, fetchMarsWeather, fetchAPOD } from "@/lib/nasaClient";
 import { DEFAULT_FILTERS, LANDING_SITE_OPTIONS, ROVER_CAMERAS, ROVER_OPTIONS } from "@/lib/constants";
-import { CameraCode, PhotoSummary, ProcessedPhoto, QueryFilters } from "@/types/nasa";
+import { CameraCode, PhotoSummary, ProcessedPhoto, QueryFilters, MarsWeatherData, APODData } from "@/types/nasa";
 
 import ErrorDisplay from "./ErrorDisplay";
 import LoadingSpinner from "./LoadingSpinner";
@@ -24,8 +24,8 @@ const MarsPhotos = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
-  const [marsWeather, setMarsWeather] = useState<any>(null);
-  const [apod, setApod] = useState<any>(null);
+  const [marsWeather, setMarsWeather] = useState<MarsWeatherData | null>(null);
+  const [apod, setApod] = useState<APODData | null>(null);
 
   // Initialize with mock data immediately to avoid loading issues
   useEffect(() => {
@@ -85,9 +85,10 @@ const MarsPhotos = () => {
           setApod(apodResult);
           setInitialLoading(false);
         }
-      } catch (err: Error) {
+      } catch (err) {
         if (!cancelled) {
-          setError(err.message);
+          const errorMessage = err instanceof Error ? err.message : 'Failed to fetch photos';
+          setError(errorMessage);
           setInitialLoading(false);
         }
       } finally {
